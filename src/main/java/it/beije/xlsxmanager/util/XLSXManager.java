@@ -12,14 +12,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.util.ResourceUtils;
+
 
 @Slf4j
 public class XLSXManager {
@@ -35,8 +32,7 @@ public class XLSXManager {
 		try {
 //			fis = new FileInputStream(new File("/Users/matteoprovezza/Desktop/xlsxManager.xlsx"));
 
-			fis = new FileInputStream(new File(
-					"/Users/matteoprovezza/Desktop/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
+			fis = new FileInputStream(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
 
 			XSSFWorkbook workbook = new XSSFWorkbook(fis);
 			XSSFSheet sheet = workbook.getSheetAt(0);
@@ -49,7 +45,6 @@ public class XLSXManager {
 					if (row.getCell(j) != null) {
 						String name = row.getCell(j).getCellType().name();
 						switch (name) {
-
 						case "NUMERIC": {
 							System.out.print(row.getCell(j).getNumericCellValue() + "\t\t"); // System.out.print((int)row.getCell(j).getNumericCellValue()+"\t\t");
 							break;
@@ -61,7 +56,6 @@ public class XLSXManager {
 						}
 						}
 					}
-
 				}
 				System.out.println("");
 			}
