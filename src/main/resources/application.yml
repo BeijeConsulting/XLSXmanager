@@ -10,3 +10,7 @@ logging:
         xlsxmanager: debug
 
 
+xlsx:
+  rows: nome, cognome, eta, telefono, citta
+
+
