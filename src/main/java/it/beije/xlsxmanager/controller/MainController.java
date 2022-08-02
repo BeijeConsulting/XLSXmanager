@@ -30,7 +30,7 @@ public class MainController {
     public String helloWord(){
         log.debug("Prova Debug");
 
-        XLSXManager.reader(rows);
+        //XLSXManager.reader(rows);
 
         return "Hello Word: "+serviceProva.salutami();
     }
