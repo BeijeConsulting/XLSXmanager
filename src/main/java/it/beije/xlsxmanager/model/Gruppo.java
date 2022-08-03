@@ -39,10 +39,9 @@ public class Gruppo {
 
     public void addArticolo(Articolo articolo){
         listaArticoli.add(articolo);
+
         quantitaTotale+=articolo.getQuantita();
         importoTotale+=articolo.getImporto();
-
-
     }
 
     public List<Articolo> getListaArticoli() {

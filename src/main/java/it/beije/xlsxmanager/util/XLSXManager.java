@@ -28,69 +28,15 @@ public class XLSXManager {
 
 	private HashMap<String, List<XSSFRow>>sezioni= new HashMap<>();
 	private XSSFWorkbook workbook;
+	private  List<Gruppo>gruppiarticoli;
 
 	public 	XLSXManager(File f) throws IOException {
 		FileInputStream fis= new FileInputStream(f);
 		 workbook = new XSSFWorkbook(fis);
 		 fis.close();
+		 reader();
+		 gruppiarticoli = getGruppiArticoli();
 	}
-	/*public void reader(List<String> s) {
-
-
-		FileInputStream fis;
-		try {
-			fis = new FileInputStream(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
-			XSSFWorkbook workbook = new XSSFWorkbook(fis);
-			XSSFSheet sheet = workbook.getSheetAt(0);
-
-			try {
-				System.out.println(setInfoGeneriche(sheet));
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-
-
-
-	/*		for (int i = 0; i < sheet.getLastRowNum() + 1; i++) {
-				XSSFRow row = sheet.getRow(i);
-
-				for (int j = 0; row != null && j < row.getLastCellNum(); j++) {
-
-					if (row.getCell(j) != null) {
-						String name = row.getCell(j).getCellType().name();
-
-						System.out.println("FONT: "+row.getCell(j).getCellStyle().getFont().getFontHeightInPoints());
-
-						switch (name) {
-							case "NUMERIC": {
-								System.out.print(row.getCell(j).getNumericCellValue() + "\t\t"); // System.out.print((int)row.getCell(j).getNumericCellValue()+"\t\t");
-								break;
-							}
-
-							case "STRING": {
-								System.out.print(row.getCell(j).getStringCellValue() + "\t\t");
-								break;
-							}
-						}
-					}
-				}
-				System.out.println("");
-			}
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-*/
 
 	private InfoGeneriche setInfoGeneriche(XSSFSheet sheet) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
@@ -150,12 +96,9 @@ public class XLSXManager {
 		return infoGeneriche;
 	}
 
-		public HashMap<String, List<XSSFRow>>  reader() throws IOException {
-
+	private HashMap<String, List<XSSFRow>>  reader() throws IOException {
 
 			List<XSSFRow> righeDiSezioni= new ArrayList<>();
-
-
 
 			XSSFSheet sheet = workbook.getSheetAt(0);
 
@@ -164,19 +107,6 @@ public class XLSXManager {
 				XSSFRow row = sheet.getRow(r);
 
 				if(row!=null ) {
-
-					/*boolean startSkip=false;
-					if(row.getCell(row.getFirstCellNum()).toString().equals("Dettagli")){
-						startSkip=true;
-					}
-					if(startSkip){
-						if(!row.getCell(row.getFirstCellNum()).toString().equals("Pagamenti")){
-							break;
-						}else{
-							startSkip=false;
-						}
-					}else*/
-
 						if( row.getLastCellNum()==1 && row.getCell(row.getFirstCellNum()).getCellStyle().getFont().getFontHeightInPoints()==10 || r>=sheet.getLastRowNum()){
 							if(!key.equals(row.getCell(row.getFirstCellNum()).toString())){
 								sezioni.put(key,righeDiSezioni);
@@ -191,18 +121,16 @@ public class XLSXManager {
 							righeDiSezioni.add(row);
 						}
 				}
-
-
-
 			}
 
-
-
-						//row.getCell(c)!=null && row.getCell(c).getCellStyle().getFont().getBold()
 			return sezioni;
 		}
 
-		public 	List<Gruppo> getGruppiArticoli(){
+	public   List<Gruppo> getGruppiConArticoli(){
+		return this.gruppiarticoli;
+	}
+
+		private  	List<Gruppo> getGruppiArticoli(){
 			List<XSSFRow> sezione = sezioni.get("Gruppi e articoli");
 			List<Gruppo> gruppos=new ArrayList<>();
 			sezione.remove(0);
@@ -232,31 +160,15 @@ public class XLSXManager {
 
 	public static void main(String[] args) {
 
-		//Categoria principale= 12 bold
-		//Categoria secondaria= 10 bold
-		//Stringa->attributi  valori->numerici
 		try {
 			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
 
-			HashMap<String, List<XSSFRow>> sezioni = x.reader();
-			//System.out.println("================KEY:"+sezioni.keySet().toString());
-
-		/*	sezioni.forEach((k,v)->{
-
-				String rowS="";
-				for(XSSFRow r:v){
-					for (int j = 0; r != null && j < r.getLastCellNum(); j++) {
-						rowS+=r.getCell(j)+" | ";
-					}
-					rowS+="\n";
-				}
-				System.out.println(">>>>>>>>>>>>>K:"+k+"   v:"+rowS);
-			});*/
+		//	HashMap<String, List<XSSFRow>> sezioni = x.reader();
 
 
 			Gson gson= new Gson();
 			HashMap<String,Object > l = new HashMap<>();
-			List<Gruppo> r = x.getGruppiArticoli();
+			List<Gruppo> r = x.getGruppiConArticoli();
 			l.put("GruppiArticoli",r);
 
 			Double totaleImporto=0.0;
@@ -273,6 +185,20 @@ public class XLSXManager {
 
 
 			System.out.println(json);
+			//System.out.println("================KEY:"+sezioni.keySet().toString());
+
+			/*	sezioni.forEach((k,v)->{
+
+				String rowS="";
+				for(XSSFRow r:v){
+					for (int j = 0; r != null && j < r.getLastCellNum(); j++) {
+						rowS+=r.getCell(j)+" | ";
+					}
+					rowS+="\n";
+				}
+				System.out.println(">>>>>>>>>>>>>K:"+k+"   v:"+rowS);
+			});*/
+
 	/*		for (Gruppo g:x.getGruppiArticoli()){
 				System.out.print("==============");
 				System.out.print("Codice: "+g.getCodice()+"\t");
@@ -285,7 +211,6 @@ public class XLSXManager {
 				}
 				System.out.print("==============");
 			}*/
-
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
