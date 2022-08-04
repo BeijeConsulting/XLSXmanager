@@ -16,9 +16,6 @@ logging:
         xlsxmanager: debug
 
 
-xlsx:
-  rows: nome, cognome, eta, telefono, citta
-
 location:
   directory: src/main/resources/files
 

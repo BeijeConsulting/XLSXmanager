@@ -4,22 +4,21 @@
  */
 package it.beije.xlsxmanager.util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import it.beije.xlsxmanager.model.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.*;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.util.ResourceUtils;
-
-import javax.swing.text.Style;
 
 
 @Slf4j
@@ -28,6 +27,17 @@ public class XLSXManager {
 	private HashMap<String, List<XSSFRow>>sezioni= new HashMap<>();
 	private XSSFWorkbook workbook;
 	private  List<Gruppo>gruppiarticoli;
+
+
+	private static final String KEY_INFO_GENERALI="Info Generali";
+	private static final String KEY_GRUPPI_E_ARTICOLI="Gruppi e articoli";
+	private static final String KEY_TRANSAZIONI_SOSPESE="Transazioni sospese";
+	private static final String KEY_TRANSAZIONI_ELIMINATE="Transazioni eliminate";
+	private static final String KEY_TRANSAZIONI="Transazioni eliminate e sospese";
+	private static final String KEY_TIPI_SERVIZIO="Tipi di servizio";
+	private static final String KEY_PAGAMENTI="Pagamenti";
+	private static final String KEY_SCONTI="Sconti";
+
 
 	public 	XLSXManager(File f) throws IOException {
 		FileInputStream fis= new FileInputStream(f);
@@ -98,8 +108,8 @@ public class XLSXManager {
 		return infoGeneriche;
 	}
 
-	private InfoGeneriche getInfoGeneriche() {
-		List<XSSFRow> sezione = sezioni.get("");
+	public InfoGeneriche getInfoGeneriche() {
+		List<XSSFRow> sezione = sezioni.get(KEY_INFO_GENERALI);
 		InfoGeneriche infoGeneriche = new InfoGeneriche();
 
 		for (int i=0; i<sezione.size();i++){
@@ -130,7 +140,7 @@ public class XLSXManager {
 
 		XSSFSheet sheet = workbook.getSheetAt(0);
 
-		String key="";
+		String key=KEY_INFO_GENERALI;
 		for (int r = 1; r < sheet.getLastRowNum() + 1; r++) {
 			XSSFRow row = sheet.getRow(r);
 
@@ -186,8 +196,8 @@ public class XLSXManager {
 		return gruppos;
 	}
 
-	private List<TransazioniSospese> getTransazioniSospese(){
-		List<XSSFRow> sezione = sezioni.get("Transazioni sospese");
+	public List<TransazioniSospese> getTransazioniSospese(){
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_SOSPESE);
 		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
 		sezione.remove(0);
 		sezione.remove(sezione.size()-1);
@@ -209,13 +219,14 @@ public class XLSXManager {
 		return transazioniSospese;
 	}
 
-	private List<TransazioniSospese> getTransazioniEliminate(){
-		List<XSSFRow> sezione = sezioni.get("Transazioni eliminate");
+	public List<TransazioniSospese> getTransazioniEliminate(){
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_ELIMINATE);
 		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
 		sezione.remove(0);
 		sezione.remove(sezione.size()-1);
 
 		TransazioniSospese temp;
+
 
 		for (XSSFRow row:sezione) {
 			temp = new TransazioniSospese();
@@ -232,8 +243,8 @@ public class XLSXManager {
 		return transazioniSospese;
 	}
 
-	private Transazioni getTransazioni(XLSXManager x){
-		List<XSSFRow> sezione = sezioni.get("Transazioni eliminate e sospese");
+	public Transazioni getTransazioni(){
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI);
 		Transazioni transazioni=new Transazioni();
 
 		transazioni.setTransazioniEliminate(Double.parseDouble(sezione.get(0).getCell(2).toString()));
@@ -243,8 +254,8 @@ public class XLSXManager {
 	}
 
 
-	private List<TipoDiServizio> getTipiDiServizio(){
-		List<XSSFRow> sezione = sezioni.get("Tipi di servizio");
+	public List<TipoDiServizio> getTipiDiServizio(){
+		List<XSSFRow> sezione = sezioni.get(KEY_TIPI_SERVIZIO);
 		List<TipoDiServizio> tipoDiServizioList = new ArrayList<>();
 		sezione.remove(0);
 		sezione.remove(sezione.size()-1);
@@ -264,8 +275,8 @@ public class XLSXManager {
 		return tipoDiServizioList;
 	}
 
-	private List<Pagamento> getPagamenti(){
-		List<XSSFRow> sezione = sezioni.get("Pagamenti");
+	public List<Pagamento> getPagamenti(){
+		List<XSSFRow> sezione = sezioni.get(KEY_PAGAMENTI);
 		List<Pagamento> pagamenti = new ArrayList<>();
 		sezione.remove(0);
 		sezione.remove(sezione.size()-1);
@@ -285,8 +296,8 @@ public class XLSXManager {
 		return pagamenti;
 	}
 
-	private List<Sconto> getSconti(){
-		List<XSSFRow> sezione = sezioni.get("Sconti");
+	public List<Sconto> getSconti(){
+		List<XSSFRow> sezione = sezioni.get(KEY_SCONTI);
 		List<Sconto> sconti = new ArrayList<>();
 		sezione.remove(0);
 		sezione.remove(sezione.size()-1);
@@ -305,60 +316,113 @@ public class XLSXManager {
 
 		return sconti;
 	}
+	public byte[] getStreamJSON() {
+		Gson gson= new GsonBuilder().setPrettyPrinting().create();
+		HashMap<String,Object > l = new LinkedHashMap<>();
 
+		l.put(KEY_INFO_GENERALI.replaceAll(" ","_").toLowerCase(),getInfoGeneriche());
+
+
+		//===============================TIPI DI SERVIZIO====================================================
+
+		List<TipoDiServizio> listTipiDiServizio =getTipiDiServizio();
+		HashMap<String, Object> hlistTipiDiServizio=new LinkedHashMap<>();
+		double totImportoTipo=0.0;
+
+		for (TipoDiServizio t:listTipiDiServizio) {
+			log.debug("Get importo"+t.getImporto());
+			totImportoTipo+=t.getImporto();
+			log.debug("totale"+totImportoTipo);
+		}
+		log.debug("totaleDefinitivo"+totImportoTipo);
+
+		hlistTipiDiServizio.put("lista_servizi",listTipiDiServizio);
+		hlistTipiDiServizio.put("totale",totImportoTipo);
+
+		l.put(KEY_TIPI_SERVIZIO.replaceAll(" ","_").toLowerCase(), hlistTipiDiServizio);
+
+
+		//===============================SCONTI====================================================
+		List<Sconto> lsconti =getSconti();
+		HashMap<String, Object> hsconti=new LinkedHashMap<>();
+		Double totSconti=0.0;
+		for (Sconto s:lsconti) {
+			totImportoTipo+=s.getImporto();
+		}
+
+		hsconti.put("lista_sconti",lsconti);
+		hsconti.put("totale",totSconti);
+		l.put(KEY_SCONTI.replaceAll(" ","_").toLowerCase(),hsconti);
+
+		//===============================PAGAMENTI====================================================
+
+		List<Pagamento> lpagamenti =getPagamenti();
+		HashMap<String, Object> hpagamenti=new LinkedHashMap<>();
+		Double totPagamenti=0.0;
+		for (Pagamento s:lpagamenti) {
+			totPagamenti+=s.getImporto();
+		}
+
+		hpagamenti.put("lista_pagamenti",lpagamenti);
+		hpagamenti.put("totale",totPagamenti);
+
+		l.put(KEY_PAGAMENTI.replaceAll(" ","_").toLowerCase(),hpagamenti);
+
+		//===============================TRANSAZIONI====================================================
+
+		List<TransazioniSospese> ltransazioniSospese =getTransazioniSospese();
+		HashMap<String, Object> htransazioniSospese=new LinkedHashMap<>();
+		Double tottransazioniSospese=0.0;
+		for (TransazioniSospese s:ltransazioniSospese) {
+			tottransazioniSospese+=s.getSubTotale();
+		}
+
+		htransazioniSospese.put("lista_transazioniSospese",ltransazioniSospese);
+		htransazioniSospese.put("totale",tottransazioniSospese);
+
+
+		l.put(KEY_TRANSAZIONI_SOSPESE.replaceAll(" ","_").toLowerCase(),htransazioniSospese);
+
+		//===============================Gruppi Con Articoli====================================================
+		List<Gruppo> r = getGruppiConArticoli();
+		HashMap<String, Object> gruppiArticoli=new LinkedHashMap<>();
+
+		gruppiArticoli.put("gruppi_con_articoli",r);
+		Double totaleImporto=0.0;
+		Integer totaleQuantita=0;
+		for (Gruppo temp :r) {
+			totaleImporto+=temp.getImportoTotale();
+			totaleQuantita+=temp.getQuantitaTotale();
+		}
+		gruppiArticoli.put("articoli",totaleImporto);
+		gruppiArticoli.put("totaleImportoGruppi",totaleImporto);
+		gruppiArticoli.put("totaleQuantitaGruppi",totaleQuantita);
+
+		l.put(KEY_GRUPPI_E_ARTICOLI.replaceAll(" ","_").toLowerCase(),gruppiArticoli);
+
+		String forFile=  gson.toJson(l);
+
+		return  forFile.getBytes();
+	}
 
 
 
 	public static void main(String[] args) {
 
 		try {
-			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
+			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/test.xlsx"));
 			System.out.println(x.getInfoGeneriche());
 			System.out.println(x.getTransazioniSospese());
 			System.out.println(x.getTipiDiServizio());
 			System.out.println(x.getPagamenti());
 			System.out.println(x.getSconti());
-			System.out.println(x.getTransazioni(x));
-
-
-
-
-			//	HashMap<String, List<XSSFRow>> sezioni = x.reader();
-
-
-			//System.out.println("================KEY:"+sezioni.keySet().toString());
-
-			/*	sezioni.forEach((k,v)->{
-
-				String rowS="";
-				for(XSSFRow r:v){
-					for (int j = 0; r != null && j < r.getLastCellNum(); j++) {
-						rowS+=r.getCell(j)+" | ";
-					}
-					rowS+="\n";
-				}
-				System.out.println(">>>>>>>>>>>>>K:"+k+"   v:"+rowS);
-			});*/
-
-	/*		for (Gruppo g:x.getGruppiArticoli()){
-				System.out.print("==============");
-				System.out.print("Codice: "+g.getCodice()+"\t");
-				System.out.print("Descrizione: "+g.getDescrizione()+"\t");
-				System.out.print("ImportoTotale: "+g.getImportoTotale()+"\t");
-				System.out.println("QuantitaTotale: "+g.getQuantitaTotale()+"");
-
-				for (Articolo articolo:g.getLista()){
-					System.out.println(articolo);
-				}
-				System.out.print("==============");
-			}*/
-
-
+			System.out.println(x.getTransazioni());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 
 	}
+
 
 }

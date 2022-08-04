@@ -1,5 +1,6 @@
 package it.beije.xlsxmanager.service.storage;
 
+import it.beije.xlsxmanager.exception.StorageException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ public interface StorageService {
 
 	void init();
 
-	void store(MultipartFile file);
+	Path store(MultipartFile file) throws StorageException;
 
 	Stream<Path> loadAll();
 
@@ -19,5 +20,7 @@ public interface StorageService {
 	Resource loadAsResource(String filename);
 
 	void deleteAll();
+
+	Path getPathResources();
 
 }

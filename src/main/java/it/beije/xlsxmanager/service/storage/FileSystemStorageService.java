@@ -22,8 +22,6 @@ import java.util.stream.Stream;
 @Service
 public class FileSystemStorageService implements StorageService {
 
-
-
 	private final Path rootLocation;
 
 	@Autowired
@@ -32,12 +30,18 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public void store(MultipartFile file) {
+	public  Path getPathResources(){
+		return rootLocation;
+	}
+
+	@Override
+	public Path store(MultipartFile file) throws StorageException{
+		Path destinationFile;
 		try {
 			if (file.isEmpty()) {
 				throw new StorageException("Failed to store empty file.");
 			}
-			Path destinationFile = this.rootLocation
+			 destinationFile = this.rootLocation
 										.resolve(Paths.get(file.getOriginalFilename()))
 										.normalize()
 										.toAbsolutePath();
@@ -53,6 +57,7 @@ public class FileSystemStorageService implements StorageService {
 		catch (IOException e) {
 			throw new StorageException("Failed to store file.", e);
 		}
+		return destinationFile;
 	}
 
 	@Override
