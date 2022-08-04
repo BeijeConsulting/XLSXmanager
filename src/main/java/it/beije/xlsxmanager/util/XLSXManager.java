@@ -403,7 +403,10 @@ public class XLSXManager {
 
 		try {
 			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/test.xlsx"));
+		//	XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/fileTestPerException.xlsx"));
+
 			System.out.println(x.getInfoGeneriche());
+
 			System.out.println(x.getTransazioniSospese());
 			System.out.println(x.getTipiDiServizio());
 			System.out.println(x.getPagamenti());

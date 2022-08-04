@@ -1,6 +1,7 @@
 package it.beije.xlsxmanager.service.storage;
 
 import it.beije.xlsxmanager.exception.StorageException;
+import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ public interface StorageService {
 
 	void init();
 
-	Path store(MultipartFile file) throws StorageException;
+	Path store(MultipartFile file) throws StorageException, StorageFileAlderyException;
 
 	Stream<Path> loadAll();
 

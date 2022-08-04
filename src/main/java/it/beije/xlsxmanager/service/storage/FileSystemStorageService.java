@@ -1,6 +1,7 @@
 package it.beije.xlsxmanager.service.storage;
 
 import it.beije.xlsxmanager.exception.StorageException;
+import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,7 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public Path store(MultipartFile file) throws StorageException{
+	public Path store(MultipartFile file) throws StorageException,StorageFileAlderyException{
 		Path destinationFile;
 		try {
 			if (file.isEmpty()) {
@@ -50,9 +51,14 @@ public class FileSystemStorageService implements StorageService {
 				// Controllo di sicurezza
 				throw new StorageException("Cannot store file outside current directory.");
 			}
+			if(Files.exists(destinationFile)) throw new StorageFileAlderyException("The file is exists already");
+
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 			}
+		}
+		catch (StorageFileAlderyException e){
+			throw e;
 		}
 		catch (IOException e) {
 			throw new StorageException("Failed to store file.", e);

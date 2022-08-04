@@ -68,6 +68,22 @@
         </div>
 
 
+        <div th:if="${failed}" id="top-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+
+            <div th:text="${failed}">dsadsa</div>
+            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+
+
+        </div>
+
+        <div th:if="${warning}" id="top-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+
+            <div th:text="${warning}">dsadsa</div>
+            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+
+
+        </div>
+
         <!--NavBar-->
 
         <nav class="navbar navbar-dark bg-dark fixed-top  justify-content-center" id="nav">

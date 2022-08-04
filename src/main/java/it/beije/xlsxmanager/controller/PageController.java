@@ -2,6 +2,7 @@ package it.beije.xlsxmanager.controller;
 
 
 import it.beije.xlsxmanager.exception.StorageException;
+import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
 import it.beije.xlsxmanager.service.storage.StorageService;
 import it.beije.xlsxmanager.util.XLSXManager;
@@ -105,12 +106,19 @@ public class PageController {
 
 		}catch (StorageException exception){
 			redirectAttributes.addFlashAttribute("failed", "Failed Upload for " + fileExcell.getOriginalFilename() + "! "+exception.getMessage());
+
+
+		}catch (StorageFileAlderyException exception){
+			redirectAttributes.addFlashAttribute("warning", "Failed Upload for " + fileExcell.getOriginalFilename() + "! "+exception.getMessage());
+
+
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("failed", "Error System: "+e.getMessage());
 			throw new RuntimeException(e);
+		}finally {
+			return "redirect:/";
 		}
 
-		return "redirect:/";
 	}
 
 	@GetMapping("/files/{filename:.+}")
