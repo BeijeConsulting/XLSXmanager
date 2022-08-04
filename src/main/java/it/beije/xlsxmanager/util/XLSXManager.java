@@ -324,21 +324,16 @@ public class XLSXManager {
 
 
 		//===============================TIPI DI SERVIZIO====================================================
-
 		List<TipoDiServizio> listTipiDiServizio =getTipiDiServizio();
 		HashMap<String, Object> hlistTipiDiServizio=new LinkedHashMap<>();
 		double totImportoTipo=0.0;
 
 		for (TipoDiServizio t:listTipiDiServizio) {
-			log.debug("Get importo"+t.getImporto());
 			totImportoTipo+=t.getImporto();
-			log.debug("totale"+totImportoTipo);
 		}
-		log.debug("totaleDefinitivo"+totImportoTipo);
 
 		hlistTipiDiServizio.put("lista_servizi",listTipiDiServizio);
 		hlistTipiDiServizio.put("totale",totImportoTipo);
-
 		l.put(KEY_TIPI_SERVIZIO.replaceAll(" ","_").toLowerCase(), hlistTipiDiServizio);
 
 
@@ -349,13 +344,11 @@ public class XLSXManager {
 		for (Sconto s:lsconti) {
 			totImportoTipo+=s.getImporto();
 		}
-
 		hsconti.put("lista_sconti",lsconti);
 		hsconti.put("totale",totSconti);
 		l.put(KEY_SCONTI.replaceAll(" ","_").toLowerCase(),hsconti);
 
 		//===============================PAGAMENTI====================================================
-
 		List<Pagamento> lpagamenti =getPagamenti();
 		HashMap<String, Object> hpagamenti=new LinkedHashMap<>();
 		Double totPagamenti=0.0;
@@ -365,11 +358,10 @@ public class XLSXManager {
 
 		hpagamenti.put("lista_pagamenti",lpagamenti);
 		hpagamenti.put("totale",totPagamenti);
-
 		l.put(KEY_PAGAMENTI.replaceAll(" ","_").toLowerCase(),hpagamenti);
 
-		//===============================TRANSAZIONI====================================================
 
+		//===============================TRANSAZIONI====================================================
 		List<TransazioniSospese> ltransazioniSospese =getTransazioniSospese();
 		HashMap<String, Object> htransazioniSospese=new LinkedHashMap<>();
 		Double tottransazioniSospese=0.0;
