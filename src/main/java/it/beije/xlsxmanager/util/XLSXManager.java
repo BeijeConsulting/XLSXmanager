@@ -198,9 +198,9 @@ public class XLSXManager {
 			temp = new TransazioniSospese();
 			temp.setSala(row.getCell(0).toString());
 			temp.setTavolo(row.getCell(1).toString());
-			temp.setConto(row.getCell(2).toString());
-			temp.setOspiti(row.getCell(3).toString());
-			temp.setSubTotale(row.getCell(4).toString());
+			temp.setConto(Short.parseShort(row.getCell(2).toString()));
+			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
+			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
 
 			transazioniSospese.add(temp);
 
@@ -221,9 +221,9 @@ public class XLSXManager {
 			temp = new TransazioniSospese();
 			temp.setSala(row.getCell(0).toString());
 			temp.setTavolo(row.getCell(1).toString());
-			temp.setConto(row.getCell(2).toString());
-			temp.setOspiti(row.getCell(3).toString());
-			temp.setSubTotale(row.getCell(4).toString());
+			temp.setConto(Short.parseShort(row.getCell(2).toString()));
+			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
+			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
 
 			transazioniSospese.add(temp);
 
@@ -236,8 +236,8 @@ public class XLSXManager {
 		List<XSSFRow> sezione = sezioni.get("Transazioni eliminate e sospese");
 		Transazioni transazioni=new Transazioni();
 
-		transazioni.setTransazioniEliminate(sezione.get(0).getCell(2).toString());
-		transazioni.setTransazioniSospese(sezione.get(1).getCell(2).toString());
+		transazioni.setTransazioniEliminate(Double.parseDouble(sezione.get(0).getCell(2).toString()));
+		transazioni.setTransazioniSospese(Double.parseDouble(sezione.get(1).getCell(2).toString()));
 
 		return transazioni;
 	}
@@ -254,8 +254,8 @@ public class XLSXManager {
 		for (XSSFRow row:sezione) {
 			temp = new TipoDiServizio();
 			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(row.getCell(1).toString());
-			temp.setImporto(row.getCell(2).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
 
 			tipoDiServizioList.add(temp);
 
@@ -275,8 +275,8 @@ public class XLSXManager {
 		for (XSSFRow row:sezione) {
 			temp = new Pagamento();
 			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(row.getCell(1).toString());
-			temp.setImporto(row.getCell(2).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
 
 			pagamenti.add(temp);
 
@@ -296,8 +296,8 @@ public class XLSXManager {
 		for (XSSFRow row:sezione) {
 			temp = new Sconto();
 			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(row.getCell(1).toString());
-			temp.setImporto(row.getCell(2).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
 
 			sconti.add(temp);
 

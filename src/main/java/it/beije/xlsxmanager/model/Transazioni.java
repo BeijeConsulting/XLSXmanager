@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @ToString
 public class Transazioni {
-    private String transazioniEliminate;
-    private String transazioniSospese;
+    private double transazioniEliminate;
+    private double transazioniSospese;
 }

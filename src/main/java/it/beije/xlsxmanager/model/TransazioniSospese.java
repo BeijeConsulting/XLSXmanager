@@ -10,8 +10,8 @@ import lombok.ToString;
 public class TransazioniSospese {
     private String sala;
     private String tavolo;
-    private String conto;
-    private String ospiti;
-    private String subTotale;
+    private short conto;
+    private short ospiti;
+    private double subTotale;
 
 }

@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class TipoDiServizio {
     private String descrizione;
-    private String quantita;
-    private String importo;
+    private short quantita;
+    private double importo;
 }
