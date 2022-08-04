@@ -36,6 +36,9 @@ public class XLSXManager {
 		 fis.close();
 		 reader();
 		 gruppiarticoli = getGruppiArticoli();
+
+
+		System.out.println(sezioni.keySet());
 	}
 
 	private InfoGeneriche setInfoGeneriche(XSSFSheet sheet) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -166,25 +169,6 @@ public class XLSXManager {
 		//	HashMap<String, List<XSSFRow>> sezioni = x.reader();
 
 
-			Gson gson= new Gson();
-			HashMap<String,Object > l = new HashMap<>();
-			List<Gruppo> r = x.getGruppiConArticoli();
-			l.put("GruppiArticoli",r);
-
-			Double totaleImporto=0.0;
-			Integer totaleQuantita=0;
-			for (Gruppo temp :r) {
-				totaleImporto+=temp.getImportoTotale();
-				totaleQuantita+=temp.getQuantitaTotale();
-			}
-
-			l.put("totaleImportoGruppi",totaleImporto);
-			l.put("totaleQuantitaGruppi",totaleQuantita);
-
-			String json = gson.toJson(l);
-
-
-			System.out.println(json);
 			//System.out.println("================KEY:"+sezioni.keySet().toString());
 
 			/*	sezioni.forEach((k,v)->{
@@ -211,6 +195,8 @@ public class XLSXManager {
 				}
 				System.out.print("==============");
 			}*/
+
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
