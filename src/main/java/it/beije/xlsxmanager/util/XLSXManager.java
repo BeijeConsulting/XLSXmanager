@@ -4,10 +4,7 @@
  */
 package it.beije.xlsxmanager.util;
 
-import com.google.gson.Gson;
-import it.beije.xlsxmanager.model.Articolo;
-import it.beije.xlsxmanager.model.Gruppo;
-import it.beije.xlsxmanager.model.InfoGeneriche;
+import it.beije.xlsxmanager.model.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -21,6 +18,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.util.ResourceUtils;
+
+import javax.swing.text.Style;
 
 
 @Slf4j
@@ -99,74 +98,232 @@ public class XLSXManager {
 		return infoGeneriche;
 	}
 
+	private InfoGeneriche getInfoGeneriche() {
+		List<XSSFRow> sezione = sezioni.get("");
+		InfoGeneriche infoGeneriche = new InfoGeneriche();
+
+		for (int i=0; i<sezione.size();i++){
+			if (i==0){
+				infoGeneriche.setDatacontabile(sezione.get(i).getCell(2).toString());
+			} else if (i==1) {
+				infoGeneriche.setStampatoil(sezione.get(i).getCell(2).toString());
+			} else if (i==2) {
+				infoGeneriche.setNumerostampe(sezione.get(i).getCell(2).toString());
+			} else if (i==3) {
+				infoGeneriche.setNegozio(sezione.get(i).getCell(2).toString());
+			} else if (i==4) {
+				infoGeneriche.setCassa(sezione.get(i).getCell(2).toString());
+			} else if (i==5) {
+				infoGeneriche.setTurnodilavoro(sezione.get(i).getCell(2).toString());
+			} else if (i==6) {
+				infoGeneriche.setOperatore(sezione.get(i).getCell(2).toString());
+			}
+		}
+
+		return infoGeneriche;
+	}
+
+
 	private HashMap<String, List<XSSFRow>>  reader() throws IOException {
 
-			List<XSSFRow> righeDiSezioni= new ArrayList<>();
+		List<XSSFRow> righeDiSezioni= new ArrayList<>();
 
-			XSSFSheet sheet = workbook.getSheetAt(0);
+		XSSFSheet sheet = workbook.getSheetAt(0);
 
-			String key="";
-			for (int r = 1; r < sheet.getLastRowNum() + 1; r++) {
-				XSSFRow row = sheet.getRow(r);
+		String key="";
+		for (int r = 1; r < sheet.getLastRowNum() + 1; r++) {
+			XSSFRow row = sheet.getRow(r);
 
-				if(row!=null ) {
-						if( row.getLastCellNum()==1 && row.getCell(row.getFirstCellNum()).getCellStyle().getFont().getFontHeightInPoints()==10 || r>=sheet.getLastRowNum()){
-							if(!key.equals(row.getCell(row.getFirstCellNum()).toString())){
-								sezioni.put(key,righeDiSezioni);
-								righeDiSezioni=new ArrayList<>();
-							}
-
-							key=row.getCell(row.getFirstCellNum()).toString();
-
-						}else if(row.getLastCellNum()==1 && row.getCell(row.getFirstCellNum()).getCellStyle().getFont().getFontHeightInPoints()!=10){
-
-						}else {
-							righeDiSezioni.add(row);
+			if(row!=null ) {
+					if( row.getLastCellNum()==1 && row.getCell(row.getFirstCellNum()).getCellStyle().getFont().getFontHeightInPoints()==10 || r>=sheet.getLastRowNum()){
+						if(!key.equals(row.getCell(row.getFirstCellNum()).toString())){
+							sezioni.put(key,righeDiSezioni);
+							righeDiSezioni=new ArrayList<>();
 						}
-				}
-			}
 
-			return sezioni;
+						key=row.getCell(row.getFirstCellNum()).toString();
+
+					}else if(row.getLastCellNum()==1 && row.getCell(row.getFirstCellNum()).getCellStyle().getFont().getFontHeightInPoints()!=10){
+
+					}else {
+						righeDiSezioni.add(row);
+					}
+			}
 		}
+
+		return sezioni;
+	}
 
 	public   List<Gruppo> getGruppiConArticoli(){
 		return this.gruppiarticoli;
 	}
 
-		private  	List<Gruppo> getGruppiArticoli(){
-			List<XSSFRow> sezione = sezioni.get("Gruppi e articoli");
-			List<Gruppo> gruppos=new ArrayList<>();
-			sezione.remove(0);
+	private  	List<Gruppo> getGruppiArticoli(){
+		List<XSSFRow> sezione = sezioni.get("Gruppi e articoli");
+		List<Gruppo> gruppos=new ArrayList<>();
+		sezione.remove(0);
 
-			Gruppo temp=null;
+		Gruppo temp=null;
 
-			for (XSSFRow row:sezione) {
+		for (XSSFRow row:sezione) {
 
-					if (row.getCell(0).getCellStyle().getFont().getBold() ){
-						temp=new Gruppo();
-						temp.setCodice(row.getCell(0).toString());
-						temp.setDescrizione(row.getCell(1).toString());
-						gruppos.add(temp);
-					}else{
-						Articolo tempA=new Articolo();
-						tempA.setCodice(row.getCell(0).toString());
-						tempA.setDescrizione(row.getCell(1).toString());
-						tempA.setQuantita(Short.parseShort(row.getCell(2).toString()));
-						tempA.setImporto(Double.parseDouble(row.getCell(3).toString()));
-						temp.addArticolo(tempA);
-					}
+				if (row.getCell(0).getCellStyle().getFont().getBold() ){
+					temp=new Gruppo();
+					temp.setCodice(row.getCell(0).toString());
+					temp.setDescrizione(row.getCell(1).toString());
+					gruppos.add(temp);
+				}else{
+					Articolo tempA=new Articolo();
+					tempA.setCodice(row.getCell(0).toString());
+					tempA.setDescrizione(row.getCell(1).toString());
+					tempA.setQuantita(Short.parseShort(row.getCell(2).toString()));
+					tempA.setImporto(Double.parseDouble(row.getCell(3).toString()));
+					temp.addArticolo(tempA);
+				}
 
-			}
-
-			return gruppos;
 		}
+
+		return gruppos;
+	}
+
+	private List<TransazioniSospese> getTransazioniSospese(){
+		List<XSSFRow> sezione = sezioni.get("Transazioni sospese");
+		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TransazioniSospese temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new TransazioniSospese();
+			temp.setSala(row.getCell(0).toString());
+			temp.setTavolo(row.getCell(1).toString());
+			temp.setConto(row.getCell(2).toString());
+			temp.setOspiti(row.getCell(3).toString());
+			temp.setSubTotale(row.getCell(4).toString());
+
+			transazioniSospese.add(temp);
+
+		}
+
+		return transazioniSospese;
+	}
+
+	private List<TransazioniSospese> getTransazioniEliminate(){
+		List<XSSFRow> sezione = sezioni.get("Transazioni eliminate");
+		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TransazioniSospese temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new TransazioniSospese();
+			temp.setSala(row.getCell(0).toString());
+			temp.setTavolo(row.getCell(1).toString());
+			temp.setConto(row.getCell(2).toString());
+			temp.setOspiti(row.getCell(3).toString());
+			temp.setSubTotale(row.getCell(4).toString());
+
+			transazioniSospese.add(temp);
+
+		}
+
+		return transazioniSospese;
+	}
+
+	private Transazioni getTransazioni(XLSXManager x){
+		List<XSSFRow> sezione = sezioni.get("Transazioni eliminate e sospese");
+		Transazioni transazioni=new Transazioni();
+
+		transazioni.setTransazioniEliminate(sezione.get(0).getCell(2).toString());
+		transazioni.setTransazioniSospese(sezione.get(1).getCell(2).toString());
+
+		return transazioni;
+	}
+
+
+	private List<TipoDiServizio> getTipiDiServizio(){
+		List<XSSFRow> sezione = sezioni.get("Tipi di servizio");
+		List<TipoDiServizio> tipoDiServizioList = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TipoDiServizio temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new TipoDiServizio();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(row.getCell(1).toString());
+			temp.setImporto(row.getCell(2).toString());
+
+			tipoDiServizioList.add(temp);
+
+		}
+
+		return tipoDiServizioList;
+	}
+
+	private List<Pagamento> getPagamenti(){
+		List<XSSFRow> sezione = sezioni.get("Pagamenti");
+		List<Pagamento> pagamenti = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		Pagamento temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new Pagamento();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(row.getCell(1).toString());
+			temp.setImporto(row.getCell(2).toString());
+
+			pagamenti.add(temp);
+
+		}
+
+		return pagamenti;
+	}
+
+	private List<Sconto> getSconti(){
+		List<XSSFRow> sezione = sezioni.get("Sconti");
+		List<Sconto> sconti = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		Sconto temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new Sconto();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(row.getCell(1).toString());
+			temp.setImporto(row.getCell(2).toString());
+
+			sconti.add(temp);
+
+		}
+
+		return sconti;
+	}
+
+
+
 
 	public static void main(String[] args) {
 
 		try {
 			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
+			System.out.println(x.getInfoGeneriche());
+			System.out.println(x.getTransazioniSospese());
+			System.out.println(x.getTipiDiServizio());
+			System.out.println(x.getPagamenti());
+			System.out.println(x.getSconti());
+			System.out.println(x.getTransazioni(x));
 
-		//	HashMap<String, List<XSSFRow>> sezioni = x.reader();
+
+
+
+			//	HashMap<String, List<XSSFRow>> sezioni = x.reader();
 
 
 			//System.out.println("================KEY:"+sezioni.keySet().toString());
