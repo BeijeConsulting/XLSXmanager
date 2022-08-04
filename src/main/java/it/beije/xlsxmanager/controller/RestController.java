@@ -6,29 +6,32 @@ package it.beije.xlsxmanager.controller;
 
 import com.google.gson.Gson;
 import it.beije.xlsxmanager.model.Gruppo;
-import it.beije.xlsxmanager.service.ServiceProva;
+import it.beije.xlsxmanager.service.storage.StorageService;
 import it.beije.xlsxmanager.util.XLSXManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestController
+@org.springframework.web.bind.annotation.RestController
 @Slf4j
-@Deprecated
-public class MainController {
+public class RestController {
 
-    @Autowired
-    private ServiceProva serviceProva;
 
-    @Value("${xlsx.rows}")
-    private List<String> rows;
 
 
     @GetMapping("/gruppiarticoli")
@@ -36,7 +39,6 @@ public class MainController {
         log.debug("GET generateJsonFile");
 
         XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/Esempio_del_file_excel_esportato_da_cassa_19_Luglio_2022.xlsx"));
-
 
 
         Gson gson= new Gson();
@@ -57,6 +59,7 @@ public class MainController {
         String forFile=  gson.toJson(l);
         return l;
     }
+
 
 
 

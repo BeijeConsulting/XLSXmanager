@@ -1,6 +1,12 @@
 spring:
   application:
     name: XlsXmanager
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 10MB
+
+
 
 
 logging:
@@ -12,5 +18,8 @@ logging:
 
 xlsx:
   rows: nome, cognome, eta, telefono, citta
+
+location:
+  directory: src/main/resources/files
 
 
