@@ -23,7 +23,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@Slf4j
+
 public class XLSXManager {
 
 	private HashMap<String, List<XSSFRow>>sezioni= new HashMap<>();
@@ -47,9 +47,6 @@ public class XLSXManager {
 		 fis.close();
 		 reader();
 		 gruppiarticoli = getGruppiArticoli();
-
-
-		System.out.println(sezioni.keySet());
 	}
 
 	private InfoGeneriche setInfoGeneriche(XSSFSheet sheet) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

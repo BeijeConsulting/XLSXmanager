@@ -43,6 +43,7 @@ public class PageController {
 
 	@GetMapping("/")
 	public String listUploadedFiles(Model model) throws IOException {
+		log.debug("GET index");
 
 		model.addAttribute("files", storageService.loadAll().map(
 				path -> MvcUriComponentsBuilder.fromMethodName(PageController.class,
@@ -53,6 +54,8 @@ public class PageController {
 
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile fileExcell, RedirectAttributes redirectAttributes) {
+
+		log.debug("Post upload");
 
 		try {
 			Path pathUpload= storageService.store(fileExcell);
@@ -81,6 +84,7 @@ public class PageController {
 	@GetMapping("/files/{filename:.+}")
 	@ResponseBody
 	public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+		log.debug("get file");
 
 		Resource file = storageService.loadAsResource(filename);
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,

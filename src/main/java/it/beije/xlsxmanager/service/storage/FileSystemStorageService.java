@@ -3,14 +3,16 @@ package it.beije.xlsxmanager.service.storage;
 import it.beije.xlsxmanager.exception.StorageException;
 import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -21,6 +23,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class FileSystemStorageService implements StorageService {
 
 	private final Path rootLocation;
@@ -37,21 +40,63 @@ public class FileSystemStorageService implements StorageService {
 
 	@Override
 	public Path store(MultipartFile file) throws StorageException,StorageFileAlderyException{
+		log.debug("service store method");
+
 		Path destinationFile;
 		try {
 			if (file.isEmpty()) {
 				throw new StorageException("Failed to store empty file.");
 			}
+
+
 			 destinationFile = this.rootLocation
 										.resolve(Paths.get(file.getOriginalFilename()))
 										.normalize()
 										.toAbsolutePath();
 
+
+			if(Files.exists(destinationFile)){
+				long numFileCopy=0;
+				if(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")+1)!="json"){
+					Path finalDestinationFile = destinationFile;
+					numFileCopy=Files.walk(this.rootLocation, 1)
+							.filter(path -> {
+								log.debug("Path: "+path.getFileName());
+								log.debug("Path destination: "+ finalDestinationFile.getFileName());
+								String name= finalDestinationFile.getFileName().toString().substring(0, finalDestinationFile.getFileName().toString().indexOf("."));
+								String ex= finalDestinationFile.getFileName().toString().substring(finalDestinationFile.getFileName().toString().indexOf("."));
+
+								return StringUtils.startsWithIgnoreCase( path.getFileName().toString(),(name+"_copy") )&& !StringUtils.endsWithIgnoreCase(path.getFileName().toString(),"json");
+							}).count();
+
+log.debug(">>>>file: "+numFileCopy);
+					String name= finalDestinationFile.getFileName().toString().substring(0, finalDestinationFile.getFileName().toString().indexOf("."));
+					String exes= finalDestinationFile.getFileName().toString().substring(finalDestinationFile.getFileName().toString().indexOf("."));
+
+					String completeName="";
+					if(numFileCopy!=0){
+						completeName=name+"_copy("+(numFileCopy)+")_"+exes;
+					}else{
+						completeName=name+"_copy_"+exes;
+					}
+
+					destinationFile = this.rootLocation
+							.resolve(Paths.get(completeName))
+							.normalize()
+							.toAbsolutePath();
+				}
+
+
+			}
+
+
+
+			log.debug("Dopo il numero");
+
 			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 				// Controllo di sicurezza
 				throw new StorageException("Cannot store file outside current directory.");
 			}
-			if(Files.exists(destinationFile)) throw new StorageFileAlderyException("The file is exists already");
 
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
@@ -65,6 +110,8 @@ public class FileSystemStorageService implements StorageService {
 		}
 		return destinationFile;
 	}
+
+
 
 	@Override
 	public Stream<Path> loadAll() {
