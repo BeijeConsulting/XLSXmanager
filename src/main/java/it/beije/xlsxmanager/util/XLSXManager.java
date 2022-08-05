@@ -7,6 +7,7 @@ package it.beije.xlsxmanager.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.beije.xlsxmanager.model.*;
+import it.beije.xlsxmanager.service.storage.MutipartFileFromJson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -19,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Slf4j
@@ -316,7 +318,13 @@ public class XLSXManager {
 
 		return sconti;
 	}
-	public byte[] getStreamJSON() {
+
+	public MultipartFile getMultipartFile(String nameWithoutExstension) {
+		return new MutipartFileFromJson(getStreamJSON().getBytes(), nameWithoutExstension);
+	}
+
+
+	public String  getStreamJSON() {
 		Gson gson= new GsonBuilder().setPrettyPrinting().create();
 		HashMap<String,Object > l = new LinkedHashMap<>();
 
@@ -392,9 +400,8 @@ public class XLSXManager {
 
 		l.put(KEY_GRUPPI_E_ARTICOLI.replaceAll(" ","_").toLowerCase(),gruppiArticoli);
 
-		String forFile=  gson.toJson(l);
 
-		return  forFile.getBytes();
+		return gson.toJson(l);
 	}
 
 
@@ -418,6 +425,7 @@ public class XLSXManager {
 
 
 	}
+
 
 
 }

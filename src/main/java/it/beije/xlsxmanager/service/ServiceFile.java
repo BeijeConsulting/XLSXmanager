@@ -7,9 +7,8 @@ package it.beije.xlsxmanager.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ServiceGruppiArticoli {
+public class ServiceFile {
     
     
-    
-    
+
 }

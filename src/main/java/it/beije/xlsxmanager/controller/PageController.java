@@ -4,6 +4,7 @@ package it.beije.xlsxmanager.controller;
 import it.beije.xlsxmanager.exception.StorageException;
 import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
+import it.beije.xlsxmanager.service.storage.MutipartFileFromJson;
 import it.beije.xlsxmanager.service.storage.StorageService;
 import it.beije.xlsxmanager.util.XLSXManager;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,6 @@ public class PageController {
 				path -> MvcUriComponentsBuilder.fromMethodName(PageController.class,
 						"serveFile", path.getFileName().toString()).build().toUri().toString())
 				.collect(Collectors.toList()));
-
 		return "index";
 	}
 
@@ -59,58 +59,15 @@ public class PageController {
 			Resource fileLoad = storageService.loadAsResource(pathUpload.getFileName().toString());
 
 			XLSXManager reader= new XLSXManager(fileLoad.getFile());
-			byte[] fileJson = reader.getStreamJSON();
 
-			storageService.store(new MultipartFile() {
-				@Override
-				public String getName() {
-					return pathUpload.getFileName()+"json";
-				}
-
-				@Override
-				public String getOriginalFilename() {
-					return pathUpload.getFileName().toString().substring(0,pathUpload.getFileName().toString().indexOf("."))+".json";
-				}
-
-				@Override
-				public String getContentType() {
-					return "json";
-				}
-
-				@Override
-				public boolean isEmpty() {
-					return fileJson.length==0;
-				}
-
-				@Override
-				public long getSize() {
-					return fileJson.length;
-				}
-
-				@Override
-				public byte[] getBytes() throws IOException {
-					return fileJson;
-				}
-
-				@Override
-				public InputStream getInputStream() throws IOException {
-					return new ByteArrayInputStream(fileJson);
-				}
-
-				@Override
-				public void transferTo(File dest) throws IOException, IllegalStateException {
-					log.debug("trasfert"+dest);
-				}
-			});
-
+			String nameWithoutExstension=pathUpload.getFileName().toString().substring(0,pathUpload.getFileName().toString().indexOf("."));
+			storageService.store(reader.getMultipartFile(nameWithoutExstension));
 
 		}catch (StorageException exception){
 			redirectAttributes.addFlashAttribute("failed", "Failed Upload for " + fileExcell.getOriginalFilename() + "! "+exception.getMessage());
 
-
 		}catch (StorageFileAlderyException exception){
 			redirectAttributes.addFlashAttribute("warning", "Failed Upload for " + fileExcell.getOriginalFilename() + "! "+exception.getMessage());
-
 
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("failed", "Error System: "+e.getMessage());
@@ -131,19 +88,16 @@ public class PageController {
 	}
 
 
-
 	@ExceptionHandler(StorageFileNotFoundException.class)
 	public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
 		return ResponseEntity.notFound().build();
 	}
+
+
+
 /*	@GetMapping("/jsonfile")
 	public ResponseEntity<InputStreamResource> index() throws IOException {
 		log.debug("GET generateJsonFile");
-
-
-
-
-
 
 		return ResponseEntity
 				.ok()
