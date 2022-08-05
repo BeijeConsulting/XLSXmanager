@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.beije.xlsxmanager.model.*;
 import it.beije.xlsxmanager.service.storage.MutipartFileFromJson;
+import it.beije.xlsxmanager.util.exception.XLSXManagerException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -46,94 +47,12 @@ public class XLSXManager {
 		 workbook = new XSSFWorkbook(fis);
 		 fis.close();
 		 reader();
-		 gruppiarticoli = getGruppiArticoli();
+//		 gruppiarticoli = getGruppiArticoli();
 
 
 		System.out.println(sezioni.keySet());
 	}
 
-	private InfoGeneriche setInfoGeneriche(XSSFSheet sheet) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-		InfoGeneriche infoGeneriche=new InfoGeneriche();
-
-		List<String> metods=new ArrayList<>();
-		for (int i = 0; i < infoGeneriche.getClass().getMethods().length; i++) {
-			metods.add(infoGeneriche.getClass().getMethods()[i].getName().toLowerCase());
-		}
-
-		System.out.println(metods);
-		for (int i=2; i<9;i++) {
-			XSSFRow row = sheet.getRow(i);
-			int j = 0;
-			String nameToMethod=row.getCell(j).toString().replaceAll(" ","").toLowerCase();
-
-			if(metods.contains("set"+nameToMethod)) {
-					String nameM = nameToMethod.substring(0, 1).toUpperCase() + nameToMethod.substring(1);
-					Method m = infoGeneriche.getClass().getMethod("set" + nameM, String.class);
-					m.invoke(infoGeneriche, row.getCell(2).toString());
-			}
-
-
-
-			/*
-				int j=2;
-				if (row.getCell(0) != null) {
-					switch (row.getCell(0).toString()){
-						case "Data contabile":{
-							infoGeneriche.setDataContabile(row.getCell(j).toString());
-							break;
-						}
-						case "Stampato il":{
-							infoGeneriche.setDataStampa(row.getCell(j).toString());
-							break;
-						}
-						case "Numero stampe":{
-							infoGeneriche.setNumeroCopie(row.getCell(j).toString());
-							break;
-						}
-						case "Negozio":{
-							infoGeneriche.setNomeNegozio(row.getCell(j).getStringCellValue());
-							break;
-						}
-						case "Cassa":{
-							infoGeneriche.setCassa(row.getCell(j).toString());
-							break;
-						}
-						case "Turno di lavoro":{
-							infoGeneriche.setTurnoDiLavoro(row.getCell(j).toString());
-							break;
-						}
-				}
-			}*/
-
-		}
-		return infoGeneriche;
-	}
-
-	public InfoGeneriche getInfoGeneriche() {
-		List<XSSFRow> sezione = sezioni.get(KEY_INFO_GENERALI);
-		InfoGeneriche infoGeneriche = new InfoGeneriche();
-
-		for (int i=0; i<sezione.size();i++){
-			if (i==0){
-				infoGeneriche.setDatacontabile(sezione.get(i).getCell(2).toString());
-			} else if (i==1) {
-				infoGeneriche.setStampatoil(sezione.get(i).getCell(2).toString());
-			} else if (i==2) {
-				infoGeneriche.setNumerostampe(sezione.get(i).getCell(2).toString());
-			} else if (i==3) {
-				infoGeneriche.setNegozio(sezione.get(i).getCell(2).toString());
-			} else if (i==4) {
-				infoGeneriche.setCassa(sezione.get(i).getCell(2).toString());
-			} else if (i==5) {
-				infoGeneriche.setTurnodilavoro(sezione.get(i).getCell(2).toString());
-			} else if (i==6) {
-				infoGeneriche.setOperatore(sezione.get(i).getCell(2).toString());
-			}
-		}
-
-		return infoGeneriche;
-	}
 
 
 	private HashMap<String, List<XSSFRow>>  reader() throws IOException {
@@ -166,158 +85,7 @@ public class XLSXManager {
 		return sezioni;
 	}
 
-	public   List<Gruppo> getGruppiConArticoli(){
-		return this.gruppiarticoli;
-	}
 
-	private  	List<Gruppo> getGruppiArticoli(){
-		List<XSSFRow> sezione = sezioni.get("Gruppi e articoli");
-		List<Gruppo> gruppos=new ArrayList<>();
-		sezione.remove(0);
-
-		Gruppo temp=null;
-
-		for (XSSFRow row:sezione) {
-
-				if (row.getCell(0).getCellStyle().getFont().getBold() ){
-					temp=new Gruppo();
-					temp.setCodice(row.getCell(0).toString());
-					temp.setDescrizione(row.getCell(1).toString());
-					gruppos.add(temp);
-				}else{
-					Articolo tempA=new Articolo();
-					tempA.setCodice(row.getCell(0).toString());
-					tempA.setDescrizione(row.getCell(1).toString());
-					tempA.setQuantita(Short.parseShort(row.getCell(2).toString()));
-					tempA.setImporto(Double.parseDouble(row.getCell(3).toString()));
-					temp.addArticolo(tempA);
-				}
-
-		}
-
-		return gruppos;
-	}
-
-	public List<TransazioniSospese> getTransazioniSospese(){
-		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_SOSPESE);
-		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
-		sezione.remove(0);
-		sezione.remove(sezione.size()-1);
-
-		TransazioniSospese temp;
-
-		for (XSSFRow row:sezione) {
-			temp = new TransazioniSospese();
-			temp.setSala(row.getCell(0).toString());
-			temp.setTavolo(row.getCell(1).toString());
-			temp.setConto(Short.parseShort(row.getCell(2).toString()));
-			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
-			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
-
-			transazioniSospese.add(temp);
-
-		}
-
-		return transazioniSospese;
-	}
-
-	public List<TransazioniSospese> getTransazioniEliminate(){
-		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_ELIMINATE);
-		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
-		sezione.remove(0);
-		sezione.remove(sezione.size()-1);
-
-		TransazioniSospese temp;
-
-
-		for (XSSFRow row:sezione) {
-			temp = new TransazioniSospese();
-			temp.setSala(row.getCell(0).toString());
-			temp.setTavolo(row.getCell(1).toString());
-			temp.setConto(Short.parseShort(row.getCell(2).toString()));
-			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
-			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
-
-			transazioniSospese.add(temp);
-
-		}
-
-		return transazioniSospese;
-	}
-
-	public Transazioni getTransazioni(){
-		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI);
-		Transazioni transazioni=new Transazioni();
-
-		transazioni.setTransazioniEliminate(Double.parseDouble(sezione.get(0).getCell(2).toString()));
-		transazioni.setTransazioniSospese(Double.parseDouble(sezione.get(1).getCell(2).toString()));
-
-		return transazioni;
-	}
-
-
-	public List<TipoDiServizio> getTipiDiServizio(){
-		List<XSSFRow> sezione = sezioni.get(KEY_TIPI_SERVIZIO);
-		List<TipoDiServizio> tipoDiServizioList = new ArrayList<>();
-		sezione.remove(0);
-		sezione.remove(sezione.size()-1);
-
-		TipoDiServizio temp;
-
-		for (XSSFRow row:sezione) {
-			temp = new TipoDiServizio();
-			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
-			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
-
-			tipoDiServizioList.add(temp);
-
-		}
-
-		return tipoDiServizioList;
-	}
-
-	public List<Pagamento> getPagamenti(){
-		List<XSSFRow> sezione = sezioni.get(KEY_PAGAMENTI);
-		List<Pagamento> pagamenti = new ArrayList<>();
-		sezione.remove(0);
-		sezione.remove(sezione.size()-1);
-
-		Pagamento temp;
-
-		for (XSSFRow row:sezione) {
-			temp = new Pagamento();
-			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
-			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
-
-			pagamenti.add(temp);
-
-		}
-
-		return pagamenti;
-	}
-
-	public List<Sconto> getSconti(){
-		List<XSSFRow> sezione = sezioni.get(KEY_SCONTI);
-		List<Sconto> sconti = new ArrayList<>();
-		sezione.remove(0);
-		sezione.remove(sezione.size()-1);
-
-		Sconto temp;
-
-		for (XSSFRow row:sezione) {
-			temp = new Sconto();
-			temp.setDescrizione(row.getCell(0).toString());
-			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
-			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
-
-			sconti.add(temp);
-
-		}
-
-		return sconti;
-	}
 
 	public MultipartFile getMultipartFile(String nameWithoutExstension) {
 		return new MutipartFileFromJson(getStreamJSON().getBytes(), nameWithoutExstension);
@@ -328,7 +96,7 @@ public class XLSXManager {
 		Gson gson= new GsonBuilder().setPrettyPrinting().create();
 		HashMap<String,Object > l = new LinkedHashMap<>();
 
-		l.put(KEY_INFO_GENERALI.replaceAll(" ","_").toLowerCase(),getInfoGeneriche());
+		l.put(KEY_INFO_GENERALI.replaceAll(" ","_").toLowerCase(), getInfoGenerali());
 
 
 		//===============================TIPI DI SERVIZIO====================================================
@@ -404,6 +172,258 @@ public class XLSXManager {
 		return gson.toJson(l);
 	}
 
+	private InfoGeneriche setInfoGeneriche(XSSFSheet sheet) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+		InfoGeneriche infoGeneriche=new InfoGeneriche();
+
+		List<String> metods=new ArrayList<>();
+		for (int i = 0; i < infoGeneriche.getClass().getMethods().length; i++) {
+			metods.add(infoGeneriche.getClass().getMethods()[i].getName().toLowerCase());
+		}
+
+		System.out.println(metods);
+		for (int i=2; i<9;i++) {
+			XSSFRow row = sheet.getRow(i);
+			int j = 0;
+			String nameToMethod=row.getCell(j).toString().replaceAll(" ","").toLowerCase();
+
+			if(metods.contains("set"+nameToMethod)) {
+				String nameM = nameToMethod.substring(0, 1).toUpperCase() + nameToMethod.substring(1);
+				Method m = infoGeneriche.getClass().getMethod("set" + nameM, String.class);
+				m.invoke(infoGeneriche, row.getCell(2).toString());
+			}
+
+
+
+			/*
+				int j=2;
+				if (row.getCell(0) != null) {
+					switch (row.getCell(0).toString()){
+						case "Data contabile":{
+							infoGeneriche.setDataContabile(row.getCell(j).toString());
+							break;
+						}
+						case "Stampato il":{
+							infoGeneriche.setDataStampa(row.getCell(j).toString());
+							break;
+						}
+						case "Numero stampe":{
+							infoGeneriche.setNumeroCopie(row.getCell(j).toString());
+							break;
+						}
+						case "Negozio":{
+							infoGeneriche.setNomeNegozio(row.getCell(j).getStringCellValue());
+							break;
+						}
+						case "Cassa":{
+							infoGeneriche.setCassa(row.getCell(j).toString());
+							break;
+						}
+						case "Turno di lavoro":{
+							infoGeneriche.setTurnoDiLavoro(row.getCell(j).toString());
+							break;
+						}
+				}
+			}*/
+
+		}
+		return infoGeneriche;
+	}
+
+	public InfoGeneriche getInfoGenerali() throws XLSXManagerException {
+		List<XSSFRow> sezione = sezioni.get(KEY_INFO_GENERALI);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_INFO_GENERALI+" non contiene nessuna riga");
+
+		InfoGeneriche infoGeneriche = new InfoGeneriche();
+
+		for (int i=0; i<sezione.size();i++){
+			if (i==0){
+				infoGeneriche.setDatacontabile(sezione.get(i).getCell(2).toString());
+			} else if (i==1) {
+				infoGeneriche.setStampatoil(sezione.get(i).getCell(2).toString());
+			} else if (i==2) {
+				infoGeneriche.setNumerostampe(sezione.get(i).getCell(2).toString());
+			} else if (i==3) {
+				infoGeneriche.setNegozio(sezione.get(i).getCell(2).toString());
+			} else if (i==4) {
+				infoGeneriche.setCassa(sezione.get(i).getCell(2).toString());
+			} else if (i==5) {
+				infoGeneriche.setTurnodilavoro(sezione.get(i).getCell(2).toString());
+			} else if (i==6) {
+				infoGeneriche.setOperatore(sezione.get(i).getCell(2).toString());
+			}
+		}
+
+		return infoGeneriche;
+	}
+
+
+	public   List<Gruppo> getGruppiConArticoli(){
+		return this.gruppiarticoli;
+	}
+
+	private  	List<Gruppo> getGruppiArticoli() throws XLSXManagerException {
+		List<XSSFRow> sezione = sezioni.get(KEY_GRUPPI_E_ARTICOLI);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_GRUPPI_E_ARTICOLI+" non contiene nessuna riga");
+
+		List<Gruppo> gruppos=new ArrayList<>();
+		sezione.remove(0);
+
+		Gruppo temp=null;
+
+		for (XSSFRow row:sezione) {
+
+			if (row.getCell(0).getCellStyle().getFont().getBold() ){
+				temp=new Gruppo();
+				temp.setCodice(row.getCell(0).toString());
+				temp.setDescrizione(row.getCell(1).toString());
+				gruppos.add(temp);
+			}else{
+				Articolo tempA=new Articolo();
+				tempA.setCodice(row.getCell(0).toString());
+				tempA.setDescrizione(row.getCell(1).toString());
+				tempA.setQuantita(Short.parseShort(row.getCell(2).toString()));
+				tempA.setImporto(Double.parseDouble(row.getCell(3).toString()));
+				temp.addArticolo(tempA);
+			}
+
+		}
+
+		return gruppos;
+	}
+
+	public List<TransazioniSospese> getTransazioniSospese() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_SOSPESE);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_TRANSAZIONI_SOSPESE+" non contiene nessuna riga");
+
+		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TransazioniSospese temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new TransazioniSospese();
+			temp.setSala(row.getCell(0).toString());
+			temp.setTavolo(row.getCell(1).toString());
+			temp.setConto(Short.parseShort(row.getCell(2).toString()));
+			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
+			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
+
+			transazioniSospese.add(temp);
+
+		}
+
+		return transazioniSospese;
+	}
+
+	public List<TransazioniSospese> getTransazioniEliminate() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI_ELIMINATE);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_TRANSAZIONI_ELIMINATE+" non contiene nessuna riga");
+
+		List<TransazioniSospese> transazioniSospese=new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TransazioniSospese temp;
+
+
+		for (XSSFRow row:sezione) {
+			temp = new TransazioniSospese();
+			temp.setSala(row.getCell(0).toString());
+			temp.setTavolo(row.getCell(1).toString());
+			temp.setConto(Short.parseShort(row.getCell(2).toString()));
+			temp.setOspiti(Short.parseShort(row.getCell(3).toString()));
+			temp.setSubTotale(Double.parseDouble(row.getCell(4).toString()));
+
+			transazioniSospese.add(temp);
+
+		}
+
+		return transazioniSospese;
+	}
+
+	public Transazioni getTransazioni() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_TRANSAZIONI);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_TRANSAZIONI+" non contiene nessuna riga");
+
+		Transazioni transazioni=new Transazioni();
+
+		transazioni.setTransazioniEliminate(Double.parseDouble(sezione.get(0).getCell(2).toString()));
+		transazioni.setTransazioniSospese(Double.parseDouble(sezione.get(1).getCell(2).toString()));
+
+		return transazioni;
+	}
+
+
+	public List<TipoDiServizio> getTipiDiServizio() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_TIPI_SERVIZIO);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_TIPI_SERVIZIO+" non contiene nessuna riga");
+
+		List<TipoDiServizio> tipoDiServizioList = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		TipoDiServizio temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new TipoDiServizio();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
+
+			tipoDiServizioList.add(temp);
+
+		}
+
+		return tipoDiServizioList;
+	}
+
+	public List<Pagamento> getPagamenti() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_PAGAMENTI);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_PAGAMENTI+" non contiene nessuna riga");
+
+		List<Pagamento> pagamenti = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		Pagamento temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new Pagamento();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
+
+			pagamenti.add(temp);
+
+		}
+
+		return pagamenti;
+	}
+
+	public List<Sconto> getSconti() throws XLSXManagerException{
+		List<XSSFRow> sezione = sezioni.get(KEY_SCONTI);
+		if(sezione==null || sezione.isEmpty()) throw new XLSXManagerException("la sezione "+KEY_SCONTI+" non contiene nessuna riga");
+
+		List<Sconto> sconti = new ArrayList<>();
+		sezione.remove(0);
+		sezione.remove(sezione.size()-1);
+
+		Sconto temp;
+
+		for (XSSFRow row:sezione) {
+			temp = new Sconto();
+			temp.setDescrizione(row.getCell(0).toString());
+			temp.setQuantita(Short.parseShort(row.getCell(1).toString()));
+			temp.setImporto(Double.parseDouble(row.getCell(2).toString()));
+
+			sconti.add(temp);
+
+		}
+
+		return sconti;
+	}
 
 
 	public static void main(String[] args) {
@@ -412,13 +432,17 @@ public class XLSXManager {
 			XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/test.xlsx"));
 		//	XLSXManager x= new XLSXManager(ResourceUtils.getFile("classpath:static/fileTestPerException.xlsx"));
 
-			System.out.println(x.getInfoGeneriche());
+			System.out.println(x.getInfoGenerali());
+//			System.out.println(x.getGruppiArticoli());
+//			System.out.println(x.getTransazioniSospese());
+//			System.out.println(x.getTransazioniEliminate());
+//			System.out.println(x.getTransazioni());
+//			System.out.println(x.getTipiDiServizio());
+//			System.out.println(x.getPagamenti());
+//			System.out.println(x.getSconti());
 
-			System.out.println(x.getTransazioniSospese());
-			System.out.println(x.getTipiDiServizio());
-			System.out.println(x.getPagamenti());
-			System.out.println(x.getSconti());
-			System.out.println(x.getTransazioni());
+
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
