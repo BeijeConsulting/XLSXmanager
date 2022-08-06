@@ -29,7 +29,7 @@ public class XLSXManager {
 
 	private HashMap<String, List<XSSFRow>>sezioni= new HashMap<>();
 	private XSSFWorkbook workbook;
-	private  List<Gruppo>gruppiarticoli;
+
 
 
 	private static final String KEY_INFO_GENERALI="Info Generali";
@@ -154,7 +154,7 @@ public class XLSXManager {
 		l.put(KEY_TRANSAZIONI_SOSPESE.replaceAll(" ","_").toLowerCase(),htransazioniSospese);
 
 		//===============================Gruppi Con Articoli====================================================
-		List<Gruppo> r = getGruppiConArticoli();
+		List<Gruppo> r = getGruppiArticoli();
 		HashMap<String, Object> gruppiArticoli=new LinkedHashMap<>();
 
 		gruppiArticoli.put("gruppi_con_articoli",r);
@@ -260,9 +260,7 @@ public class XLSXManager {
 	}
 
 
-	public   List<Gruppo> getGruppiConArticoli(){
-		return getGruppiArticoli();
-	}
+
 
 	private  	List<Gruppo> getGruppiArticoli() throws XLSXManagerException {
 		List<XSSFRow> sezione = sezioni.get(KEY_GRUPPI_E_ARTICOLI);
