@@ -4,16 +4,12 @@ package it.beije.xlsxmanager.controller;
 import it.beije.xlsxmanager.exception.StorageException;
 import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
-import it.beije.xlsxmanager.service.storage.MutipartFileFromJson;
 import it.beije.xlsxmanager.service.storage.StorageService;
 import it.beije.xlsxmanager.util.XLSXManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,9 +59,11 @@ public class PageController {
 
 			XLSXManager reader= new XLSXManager(fileLoad.getFile());
 
+			log.debug("finito di leggere il file");
 			String nameWithoutExstension=pathUpload.getFileName().toString().substring(0,pathUpload.getFileName().toString().indexOf("."));
+			log.debug("inizio creazione json ");
 			storageService.store(reader.getMultipartFile(nameWithoutExstension));
-
+			log.debug("fine creazione json ");
 		}catch (StorageException exception){
 			redirectAttributes.addFlashAttribute("failed", "Failed Upload for " + fileExcell.getOriginalFilename() + "! "+exception.getMessage());
 

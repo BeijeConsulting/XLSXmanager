@@ -69,7 +69,7 @@ public class FileSystemStorageService implements StorageService {
 								return StringUtils.startsWithIgnoreCase( path.getFileName().toString(),(name+"_copy") )&& !StringUtils.endsWithIgnoreCase(path.getFileName().toString(),"json");
 							}).count();
 
-log.debug(">>>>file: "+numFileCopy);
+					log.debug(">>>>file: "+numFileCopy);
 					String name= finalDestinationFile.getFileName().toString().substring(0, finalDestinationFile.getFileName().toString().indexOf("."));
 					String exes= finalDestinationFile.getFileName().toString().substring(finalDestinationFile.getFileName().toString().indexOf("."));
 

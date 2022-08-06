@@ -88,11 +88,13 @@ public class XLSXManager {
 
 
 	public MultipartFile getMultipartFile(String nameWithoutExstension) {
+		log.debug("entro nel metodo multipart");
 		return new MutipartFileFromJson(getStreamJSON().getBytes(), nameWithoutExstension);
 	}
 
 
 	public String  getStreamJSON() {
+		log.debug("entro nel getJson");
 		Gson gson= new GsonBuilder().setPrettyPrinting().create();
 		HashMap<String,Object > l = new LinkedHashMap<>();
 
@@ -168,7 +170,7 @@ public class XLSXManager {
 
 		l.put(KEY_GRUPPI_E_ARTICOLI.replaceAll(" ","_").toLowerCase(),gruppiArticoli);
 
-
+		log.debug("fine nel getJson");
 		return gson.toJson(l);
 	}
 
@@ -259,7 +261,7 @@ public class XLSXManager {
 
 
 	public   List<Gruppo> getGruppiConArticoli(){
-		return this.gruppiarticoli;
+		return getGruppiArticoli();
 	}
 
 	private  	List<Gruppo> getGruppiArticoli() throws XLSXManagerException {

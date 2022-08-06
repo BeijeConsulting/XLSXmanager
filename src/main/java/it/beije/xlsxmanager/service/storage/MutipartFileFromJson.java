@@ -4,19 +4,21 @@
  */
 package it.beije.xlsxmanager.service.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
+@Slf4j
 public class MutipartFileFromJson implements MultipartFile {
 
     private byte[] fileJson;
     private String name;
 
     public MutipartFileFromJson(byte[] dataJson, String name) {
+        log.debug("entro nella classe multipartJSON");
         this.fileJson = dataJson;
         this.name = name;
     }
@@ -58,7 +60,7 @@ public class MutipartFileFromJson implements MultipartFile {
 
     @Override
     public void transferTo(File dest) throws IOException, IllegalStateException {
-
+        log.debug("trasfert");
     }
 
 }
