@@ -1,0 +1,224 @@
+{
+  "info_generali": {
+    "datacontabile": "19/07/2022",
+    "stampatoil": "19/07/2022 10:37",
+    "numerostampe": "1",
+    "negozio": "RISTORANTE",
+    "cassa": "Tutte le casse",
+    "turnodilavoro": "Tutti i turni",
+    "operatore": ""
+  },
+  "tipi_di_servizio": {
+    "lista_servizi": [
+      {
+        "descrizione": "BAR",
+        "quantita": 32,
+        "importo": 82.0
+      },
+      {
+        "descrizione": "TAVOLI",
+        "quantita": 9,
+        "importo": 53.0
+      }
+    ],
+    "totale": 135.0
+  },
+  "sconti": {
+    "lista_sconti": [],
+    "totale": 0.0
+  },
+  "pagamenti": {
+    "lista_pagamenti": [
+      {
+        "descrizione": "Contanti",
+        "quantita": 28,
+        "importo": 87.0
+      },
+      {
+        "descrizione": "CC Bancomat",
+        "quantita": 13,
+        "importo": 48.0
+      }
+    ],
+    "totale": 135.0
+  },
+  "transazioni_sospese": {
+    "lista_transazioniSospese": [
+      {
+        "sala": "SALA 1",
+        "tavolo": "F3",
+        "conto": 1,
+        "ospiti": -1,
+        "subTotale": 9.5
+      },
+      {
+        "sala": "SALA 1",
+        "tavolo": "F6",
+        "conto": 1,
+        "ospiti": -1,
+        "subTotale": 6.5
+      },
+      {
+        "sala": "ASPORTO",
+        "tavolo": "VITO",
+        "conto": 1,
+        "ospiti": 4,
+        "subTotale": 192.0
+      }
+    ],
+    "totale": 208.0
+  },
+  "gruppi_e_articoli": {
+    "gruppi_con_articoli": [
+      {
+        "codice": "301",
+        "descrizione": "CAFFE",
+        "listaArticoli": [
+          {
+            "codice": "55000",
+            "descrizione": "CAFFE ESPRESSO",
+            "quantita": 41,
+            "importo": 50.5
+          },
+          {
+            "codice": "55001",
+            "descrizione": "CAFFE DOPPIO NORMALE",
+            "quantita": 1,
+            "importo": 2.2
+          },
+          {
+            "codice": "55002",
+            "descrizione": "CAFFE DEK.",
+            "quantita": 1,
+            "importo": 1.2
+          },
+          {
+            "codice": "55003",
+            "descrizione": "CAFFE ORZO PICCOLO",
+            "quantita": 1,
+            "importo": 1.5
+          },
+          {
+            "codice": "55009",
+            "descrizione": "CAPPUCCINO",
+            "quantita": 11,
+            "importo": 24.3
+          },
+          {
+            "codice": "55070",
+            "descrizione": "CAFFE MACCHIATO",
+            "quantita": 2,
+            "importo": 3.1
+          },
+          {
+            "codice": "55204",
+            "descrizione": "CAFFE. GINSENG PICCOLO",
+            "quantita": 1,
+            "importo": 2.5
+          },
+          {
+            "codice": "55206",
+            "descrizione": "BICCH. ACQUA FRIZZ.",
+            "quantita": 2,
+            "importo": 1.0
+          },
+          {
+            "codice": "55218",
+            "descrizione": "MACCHIATONE",
+            "quantita": 1,
+            "importo": 1.3
+          }
+        ],
+        "quantitaTotale": 61,
+        "importoTotale": 87.6
+      },
+      {
+        "codice": "317",
+        "descrizione": "BRIOCHES \u0026 BREAKFAST",
+        "listaArticoli": [
+          {
+            "codice": "4171",
+            "descrizione": "CORNET.INTEG.VUOTO",
+            "quantita": 1,
+            "importo": 1.5
+          },
+          {
+            "codice": "4173",
+            "descrizione": "FAGOTTINO AL CIOCCOLATO",
+            "quantita": 2,
+            "importo": 5.5
+          },
+          {
+            "codice": "4778",
+            "descrizione": "CORNET.CER.VUOTO",
+            "quantita": 1,
+            "importo": 2.5
+          },
+          {
+            "codice": "4850",
+            "descrizione": "CORN. CLASS.FARCITO",
+            "quantita": 5,
+            "importo": 10.4
+          },
+          {
+            "codice": "4855",
+            "descrizione": "CORN.INTEG.FARC",
+            "quantita": 1,
+            "importo": 2.5
+          }
+        ],
+        "quantitaTotale": 10,
+        "importoTotale": 22.4
+      },
+      {
+        "codice": "318",
+        "descrizione": "BEVANDE",
+        "listaArticoli": [
+          {
+            "codice": "4808",
+            "descrizione": "SUCCO LIMPIDO DI MELA 0,20",
+            "quantita": 1,
+            "importo": 4.0
+          },
+          {
+            "codice": "4811",
+            "descrizione": "SUCCO PERA 0,20",
+            "quantita": 1,
+            "importo": 4.0
+          },
+          {
+            "codice": "4820",
+            "descrizione": "ACQUA NAT. 0,50",
+            "quantita": 1,
+            "importo": 3.0
+          },
+          {
+            "codice": "4901",
+            "descrizione": "ACQUA  PET 0,50",
+            "quantita": 2,
+            "importo": 4.0
+          }
+        ],
+        "quantitaTotale": 5,
+        "importoTotale": 15.0
+      },
+      {
+        "codice": "377",
+        "descrizione": "SPREMUTE",
+        "listaArticoli": [
+          {
+            "codice": "65023",
+            "descrizione": "SPREMUTA ARANCIA",
+            "quantita": 2,
+            "importo": 10.0
+          }
+        ],
+        "quantitaTotale": 2,
+        "importoTotale": 10.0
+      }
+    ],
+    "articoli": 135.0,
+    "totaleImportoGruppi": 135.0,
+    "totaleQuantitaGruppi": 78
+  }
+}

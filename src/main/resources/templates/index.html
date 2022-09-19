@@ -12,7 +12,7 @@
     <style>
         table {
             text-align: center;
-            margin-top: 65px;
+            margin-top: 90px;
 
         }
 
@@ -45,6 +45,18 @@
         function showname () {
             let name = document.getElementById('file');
             let label = document.getElementById('labelforFile');
+
+            label.setAttribute("placeholder",name.files.item(0).name);
+
+
+            //alert('Selected file: ' + name.files.item(0).name);
+            //alert('Selected file: ' + name.files.item(0).size);
+            //alert('Selected file: ' + name.files.item(0).type);
+        };
+
+        function showname1 () {
+            let name = document.getElementById('file1');
+            let label = document.getElementById('labelforFile1');
 
             label.setAttribute("placeholder",name.files.item(0).name);
 
@@ -92,6 +104,13 @@
                     <label class="btn btn-success">Chose File <input type="file" id="file" name="file"  onchange="showname()" hidden  accept=".xlsx"></label>
                     <input class="form-control" id="labelforFile" placeholder="File path" aria-label="File path" disabled>
                     <input class="btn btn-success" type="submit" value="Upload" />
+                </div>
+            </form>
+            <form class="form-inline m-2" method="POST" enctype="multipart/form-data" action="/convert">
+                <div class="input-group">
+                    <label class="btn btn-success">Chose File <input type="file" id="file1" name="file1"  onchange="showname1()" hidden  accept=".json"></label>
+                    <input class="form-control" id="labelforFile1" placeholder="File path" aria-label="File path" disabled>
+                    <input class="btn btn-success" type="submit" value="Convert" />
                 </div>
             </form>
         </nav>

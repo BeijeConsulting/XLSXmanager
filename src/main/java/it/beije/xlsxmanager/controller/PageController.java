@@ -1,10 +1,12 @@
 package it.beije.xlsxmanager.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.beije.xlsxmanager.exception.StorageException;
 import it.beije.xlsxmanager.exception.StorageFileAlderyException;
 import it.beije.xlsxmanager.exception.StorageFileNotFoundException;
 import it.beije.xlsxmanager.service.storage.StorageService;
+import it.beije.xlsxmanager.util.JsonToExcelConverter;
 import it.beije.xlsxmanager.util.XLSXManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
@@ -30,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PageController {
 	private final StorageService storageService;
+
+	private ObjectMapper mapper = new ObjectMapper();
 
 	@Autowired
 	public PageController(StorageService storageService) {
@@ -48,6 +48,35 @@ public class PageController {
 		return "index";
 	}
 
+	@PostMapping("/convert")
+	public String convertJsonToXLSX(@RequestParam("file1") MultipartFile jsonfile, RedirectAttributes redirectAttributes) throws IOException {
+
+		log.debug("Post convert");
+		try{
+
+			JsonToExcelConverter jsonToExcelConverter = new JsonToExcelConverter();
+
+			Path pathUpload= storageService.store(jsonfile);
+			log.debug(pathUpload.toString());
+			Resource fileLoad = storageService.loadAsResource(pathUpload.getFileName().toString());
+
+			File converted = jsonToExcelConverter.jsonFileToExcelFile(fileLoad.getFile(),".xlsx");
+
+
+			log.debug("Convert done");
+		}catch (StorageException exception){
+			redirectAttributes.addFlashAttribute("failed", "Failed Upload for " + jsonfile.getName() + "! "+exception.getMessage());
+
+		}catch (StorageFileAlderyException exception){
+			redirectAttributes.addFlashAttribute("warning", "Failed Upload for " + jsonfile.getName() + "! "+exception.getMessage());
+
+		} finally {
+			return "redirect:/";
+		}
+	}
+
+
+
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile fileExcell, RedirectAttributes redirectAttributes) {
 
@@ -55,6 +84,7 @@ public class PageController {
 
 		try {
 			Path pathUpload= storageService.store(fileExcell);
+			log.debug(pathUpload.toString());
 			Resource fileLoad = storageService.loadAsResource(pathUpload.getFileName().toString());
 
 			XLSXManager reader= new XLSXManager(fileLoad.getFile());
