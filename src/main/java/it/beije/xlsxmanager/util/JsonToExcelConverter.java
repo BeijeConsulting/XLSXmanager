@@ -1,37 +1,23 @@
 package it.beije.xlsxmanager.util;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import it.beije.xlsxmanager.model.*;
-import it.beije.xlsxmanager.service.storage.MutipartFileFromJson;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.ResourceUtils;
 
-/**
- * @author javacodepoint.com
- */
+
 @Slf4j
 public class JsonToExcelConverter {
 
@@ -715,18 +701,6 @@ public class JsonToExcelConverter {
         return countRow;
     }
 
-    /**
-     * Main method to test this converter
-     *
-     * @param args
-     */
-    public static void main(String[] args) throws IOException {
 
-        File srcFile = new File("C:/Users/aless_in4zoow/Downloads/test.json");
-        JsonToExcelConverter converter = new JsonToExcelConverter();
-        File xlsxFile = converter.jsonFileToExcelFile(srcFile, ".xlsx");
-        System.out.println("Sucessfully converted JSON to Excel file at =" + xlsxFile.getAbsolutePath());
-
-    }
 
 }
